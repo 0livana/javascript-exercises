@@ -1,56 +1,59 @@
-const divContainer = document.querySelector("#container");
-const sizeButton = document.querySelector("#sizeButton");
-const clearButton = document.querySelector("#clearButton");
+const container = document.querySelector("#grid-container");
+const resizeButton = document.querySelector("#resize-btn");
 
-
-    // Create the grid
 function createGrid(size) {
+  // Remove the old grid
+  container.innerHTML = "";
 
-      // Remove the old grid
-    divContainer.innerHTML = "";
+  const squareSize = 960 / size;
 
-    // Create size × size squares
-    for (let i = 0; i < size * size; i++) {
+  for (let i = 0; i < size * size; i++) {
+    const square = document.createElement("div");
 
-        const grid = document.createElement("div");
+    square.classList.add("grid-square");
 
-        grid.classList.add("grid");
+    square.style.width = `${squareSize}px`;
+    square.style.height = `${squareSize}px`;
 
-        // Make each square fit perfectly inside the container
-        grid.style.width = `${100 / size}%`;
-        grid.style.height = `${100 / size}%`;
+    square.addEventListener("mouseenter", () => {
+      // Random RGB color
+      const red = Math.floor(Math.random() * 256);
+      const green = Math.floor(Math.random() * 256);
+      const blue = Math.floor(Math.random() * 256);
 
-        // Change color when mouse enters
-        grid.addEventListener("mouseenter", () => {
-          grid.style.backgroundColor = "black";
-        });
+      square.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
 
-        divContainer.append(grid);
-    }
+      // Progressive darkening
+      let darkness = Number(square.dataset.darkness) || 0;
+
+      if (darkness < 10) {
+        darkness++;
+        square.dataset.darkness = darkness;
+
+        square.style.filter = `brightness(${100 - darkness * 10}%)`;
+      }
+    });
+
+    container.appendChild(square);
+  }
 }
 
+resizeButton.addEventListener("click", () => {
+  let size = prompt("How many squares per side? (1-100)");
 
-    // Ask user for grid size
-sizeButton.addEventListener("click", () => {
+  if (size === null) {
+    return;
+  }
 
-    const size = Number(
-      prompt("Enter a grid size (1 - 100):")
-    );
+  size = Number(size);
 
-    if (size >= 1 && size <= 100) {
-      createGrid(size);
-    } else {
-      alert("Please enter a number between 1 and 100.");
-    }
+  if (!Number.isInteger(size) || size < 1 || size > 100) {
+    alert("Please enter a whole number between 1 and 100.");
+    return;
+  }
 
+  createGrid(size);
 });
 
-
-//Clear the grid
-clearButton.addEventListener("click", () => {
-  createGrid(16);
-});
-
-
-//Create the initial 16 × 16 grid
+// Create the initial 16 × 16 grid
 createGrid(16);
